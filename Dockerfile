@@ -65,7 +65,7 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
     $CONDA_DIR/bin/conda install -n pyenv -c conda-forge openmpi mpi4py -y
 
 # Define PyTorch versions via arguments
-ARG PYTORCH="2.5.1"
+ARG PYTORCH="2.6.0"
 ARG CUDA="124"
 
 # Install PyTorch with specified version and CUDA
