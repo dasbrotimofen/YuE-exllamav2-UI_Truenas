@@ -3,7 +3,6 @@
 echo "pod started"
 
 
-
 if [[ $PUBLIC_KEY ]]
 then
     mkdir -p ~/.ssh

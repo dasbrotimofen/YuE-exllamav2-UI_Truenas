@@ -11,7 +11,7 @@ descript-audiotools>=0.7.2
 descript-audio-codec
 scipy==1.15.1
 accelerate>=0.26.0
-gradio
+gradio==5.50.0
 flash-attn
 triton
 sageattention

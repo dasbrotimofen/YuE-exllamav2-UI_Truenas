@@ -61,6 +61,10 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
     bash miniconda.sh -b -p $CONDA_DIR && \
     rm miniconda.sh && \
     $CONDA_DIR/bin/conda init bash && \
+    # Accept Anaconda Terms of Service for required channels
+    $CONDA_DIR/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    $CONDA_DIR/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    # Now create env and install packages
     $CONDA_DIR/bin/conda create -n pyenv python=3.12 -y && \
     $CONDA_DIR/bin/conda install -n pyenv -c conda-forge openmpi mpi4py -y
 
@@ -75,8 +79,10 @@ RUN $CONDA_DIR/bin/conda run -n pyenv \
 RUN $CONDA_DIR/bin/conda install -n pyenv nvidia/label/cuda-12.4.1::cuda-nvcc
 
 RUN $CONDA_DIR/bin/conda run -n pyenv pip install setuptools
-COPY exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl .
-RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl
+# COPY exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl .
+COPY exllamav2-0.2.8+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl .
+# RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl
+RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.2.8+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl
 
 # Install git lfs
 RUN apt-get update && apt-get install -y git-lfs && git lfs install
@@ -109,6 +115,9 @@ COPY --chmod=755 . /YuE-exllamav2-UI
 
 COPY --chmod=755 docker/initialize.sh /initialize.sh
 COPY --chmod=755 docker/entrypoint.sh /entrypoint.sh
+
+# Normalize line endings just in case they are CRLF
+RUN sed -i 's/\r$//' /initialize.sh /entrypoint.sh
 
 # Expose the Gradio port
 EXPOSE $GRADIO_PORT
