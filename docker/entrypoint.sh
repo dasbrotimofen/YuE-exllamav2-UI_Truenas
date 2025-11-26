@@ -54,11 +54,16 @@ if [ ! -f "$INIT_MARKER" ]; then
     echo "Installing dependencies from requirements.txt..."
     pip install --no-cache-dir -r $REPO_DIR/requirements.txt
 
+    # First install flash-attn without build isolation so it can see torch
+    pip install --no-cache-dir --no-build-isolation flash-attn==2.8.3
+
+    # Then install the rest of the requirements, skipping flash-attn (already installed)
+    pip install --no-cache-dir -r <(grep -v '^flash-attn' "$REPO_DIR/requirements.txt")
 
     #cp -r $REPO_DIR/transformers/ /opt/conda/envs/pyenv/lib/python3.12/site-packages
 
     if [ ! -d "${PROJECT_DIR}/xcodec_mini_infer" ]; then
-        huggingface-cli download m-a-p/xcodec_mini_infer --local-dir "${PROJECT_DIR}/xcodec_mini_infer"
+        hf download m-a-p/xcodec_mini_infer --local-dir "${PROJECT_DIR}/xcodec_mini_infer"
     else
         echo "Skipping the model xcodec_mini_infer download because it already exists."
     fi
@@ -107,7 +112,7 @@ if [ ! -f "$INIT_MARKER" ]; then
 
             if [ ! -d "$DESTINATION" ]; then
                 echo "Downloading model: $MODEL from $SOURCE to $DESTINATION"
-                huggingface-cli download "$SOURCE" --local-dir "$DESTINATION"
+                hf download "$SOURCE" --local-dir "$DESTINATION"
             else
                 echo "Skipping the model $MODEL because it already exists in $DESTINATION."
             fi

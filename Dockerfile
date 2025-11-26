@@ -1,7 +1,7 @@
 ARG CUDA_VERSION="12.4.1"
 ARG CUDNN_VERSION=""
 ARG UBUNTU_VERSION="22.04"
-ARG DOCKER_FROM=nvidia/cuda:$CUDA_VERSION-cudnn$CUDNN_VERSION-devel-ubuntu$UBUNTU_VERSION
+ARG DOCKER_FROM=pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 ARG GRADIO_PORT=7860
 
 FROM $DOCKER_FROM AS base
@@ -55,18 +55,9 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV PATH="/opt/conda/envs/pyenv/bin:$PATH"
 
-
-# Download and install Miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
-    bash miniconda.sh -b -p $CONDA_DIR && \
-    rm miniconda.sh && \
-    $CONDA_DIR/bin/conda init bash && \
-    # Accept Anaconda Terms of Service for required channels
-    $CONDA_DIR/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
-    $CONDA_DIR/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
-    # Now create env and install packages
-    $CONDA_DIR/bin/conda create -n pyenv python=3.12 -y && \
-    $CONDA_DIR/bin/conda install -n pyenv -c conda-forge openmpi mpi4py -y
+# Create env and install packages using existing conda
+RUN conda create -n pyenv python=3.12 -y && \
+    conda install -n pyenv -c conda-forge openmpi mpi4py -y
 
 # Define PyTorch versions via arguments
 ARG PYTORCH="2.6.0"
@@ -80,9 +71,9 @@ RUN $CONDA_DIR/bin/conda install -n pyenv nvidia/label/cuda-12.4.1::cuda-nvcc
 
 RUN $CONDA_DIR/bin/conda run -n pyenv pip install setuptools
 # COPY exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl .
-COPY exllamav2-0.2.8+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl .
+COPY exllamav2-0.3.2+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl .
 # RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl
-RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.2.8+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl
+RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.3.2+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl
 
 # Install git lfs
 RUN apt-get update && apt-get install -y git-lfs && git lfs install
@@ -96,7 +87,9 @@ COPY docker/default /etc/nginx/sites-available/default
 # Add Jupyter Notebook
 RUN pip install jupyterlab ipywidgets jupyter-archive jupyter_contrib_nbextensions
 
-RUN pip install -U "huggingface_hub[cli]"
+# RUN pip install -U "huggingface_hub[cli]"
+RUN $CONDA_DIR/bin/conda run -n pyenv \
+    pip install -U huggingface_hub
 
 EXPOSE 8888
 

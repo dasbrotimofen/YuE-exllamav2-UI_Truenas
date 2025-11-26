@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   yue-exllamav2-interface :
-    image: alissonpereiraanjos/yue-exllamav2-interface:latest  # Docker image for YuE Interface
+    image: dasbrotimofen/yue-exllama-truenas-pytorch2.6.0-cu124  # Docker image for YuE Interface
     container_name: yue-exllamav2-interface  # Name of the container
     restart: unless-stopped  # Restart policy: always restart unless manually stopped
     ports:
