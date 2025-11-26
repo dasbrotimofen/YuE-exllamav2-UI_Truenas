@@ -71,9 +71,9 @@ RUN $CONDA_DIR/bin/conda install -n pyenv nvidia/label/cuda-12.4.1::cuda-nvcc
 
 RUN $CONDA_DIR/bin/conda run -n pyenv pip install setuptools
 # COPY exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl .
-COPY exllamav2-0.3.2+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl .
+COPY exllamav2-0.3.1+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl .
 # RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.2.7+cu121.torch2.5.0-cp312-cp312-linux_x86_64.whl
-RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.3.2+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl
+RUN $CONDA_DIR/bin/conda run -n pyenv pip install exllamav2-0.3.1+cu124.torch2.6.0-cp312-cp312-linux_x86_64.whl
 
 # Install git lfs
 RUN apt-get update && apt-get install -y git-lfs && git lfs install
